@@ -19,9 +19,9 @@ app.get("/saludar/:nombre", (req, res) => {
 });
 
 // A3
-app.get("/validarfecha/:ano/:mes/:dia", (req, res) => {
-    const { ano, mes, dia } = req.params;
-    const fecha = `${ano}-${mes}-${dia}`;
+app.get("/validarfecha/:año/:mes/:dia", (req, res) => {
+    const { año, mes, dia } = req.params;
+    const fecha = `${año}-${mes}-${dia}`;
     const fechaParseada = Date.parse(fecha);
 
     if (isNaN(fechaParseada)) {
@@ -64,6 +64,63 @@ app.get("/matematica/dividir", (req, res) => {
 
     const resultado = dividir(Number(n1), Number(n2));
     res.status(200).send(String(resultado));
+});
+import fetch from "node-fetch";
+
+const API_KEY = "31091a4a";
+
+// C1
+app.get("/omdb/searchbypage", async (req, res) => {
+    const { search, p } = req.params;
+
+    try {
+        const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&s=${search}&page=${p}`);
+        const data = await response.json();
+
+        res.status(200).json(data.Search || []);
+    } catch (error) {
+        res.status(400).send("Error");
+    }
+});
+
+// C2
+app.get("/omdb/searchcomplete", async (req, res) => {
+    const { search } = req.query;
+
+    try {
+        let pagina = 1;
+        let resultados = [];
+        let total = 0;
+
+        do {
+            const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&s=${search}&page=${pagina}`);
+            const data = await response.json();
+
+            if (data.Response === "False") break;
+
+            resultados = resultados.concat(data.Search);
+            total = parseInt(data.totalResults);
+            pagina++;
+        } while (resultados.length < total);
+
+        res.status(200).json(resultados);
+    } catch (error) {
+        res.status(500).send("Error");
+    }
+});
+
+// C3
+app.get("/omdb/getbyomdbid", async (req, res) => {
+    const { imdbID } = req.query;
+
+    try {
+        const response = await fetch(`http://www.omdbapi.com/?apikey=${API_KEY}&i=${imdbID}`);
+        const data = await response.json();
+
+        res.status(200).json(data || {});
+    } catch (error) {
+        res.status(500).send("Error");
+    }
 });
 
 app.listen(port, () => {
