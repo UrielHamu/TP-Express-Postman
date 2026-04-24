@@ -56,13 +56,14 @@ class DateTimeHelper {
 
   getDiaTexto = (fecha, retornarAbreviacion = false) => {
     const diasArray = [
-      "Domingo",
+      
       "Lunes",
       "Martes",
       "Miércoles",
       "Jueves",
       "Viernes",
-      "Sábado"
+      "Sábado",
+      "Domingo"
     ];
 
     const dia = diasArray[fecha.getDay()];
